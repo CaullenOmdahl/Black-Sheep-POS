@@ -1,31 +1,45 @@
 <script>
-  import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
-
-  let serverAddress = 'http://localhost:3000';
-  let username = '';
-  let password = '';
-  let passkey = '';
-
-  async function setup() {
-    const response = await fetch(`${serverAddress}/api/setup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, passkey })
-    });
-    if (response.ok) {
-      goto('/login');
-    } else {
-      alert('Setup failed');
-    }
-  }
-</script>
-
-<div class="flex flex-col items-center justify-center h-screen">
-  <h1 class="text-2xl mb-4">Initial Setup</h1>
-  <input type="text" bind:value={serverAddress} placeholder="Server Address" class="input mb-2" />
-  <input type="text" bind:value={username} placeholder="Admin Username" class="input mb-2" />
-  <input type="password" bind:value={password} placeholder="Admin Password" class="input mb-2" />
-  <input type="text" bind:value={passkey} placeholder="2FA Passkey" class="input mb-2" />
-  <button on:click={setup} class="btn btn-primary">Setup</button>
-</div>
+    import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
+    import axios from 'axios';
+  
+    let serverAddress = writable('');
+    let adminUsername = writable('');
+    let adminPassword = writable('');
+    let twoFAEnabled = writable(false);
+  
+    const setupAdmin = async () => {
+      try {
+        const response = await axios.post('/api/setup', {
+          serverAddress: $serverAddress,
+          username: $adminUsername,
+          password: $adminPassword,
+          twoFA: $twoFAEnabled
+        });
+        console.log('Setup successful', response.data);
+      } catch (error) {
+        console.error('Setup failed', error);
+      }
+    };
+  </script>
+  
+  <form on:submit|preventDefault={setupAdmin}>
+    <div>
+      <label>Server Address:</label>
+      <input type="text" bind:value={$serverAddress} required />
+    </div>
+    <div>
+      <label>Admin Username:</label>
+      <input type="text" bind:value={$adminUsername} required />
+    </div>
+    <div>
+      <label>Admin Password:</label>
+      <input type="password" bind:value={$adminPassword} required />
+    </div>
+    <div>
+      <label>Enable 2FA:</label>
+      <input type="checkbox" bind:checked={$twoFAEnabled} />
+    </div>
+    <button type="submit">Setup</button>
+  </form>
+  
