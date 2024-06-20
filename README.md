@@ -1,0 +1,2 @@
+# Black Sheep POS
+ Black Sheep POS is a modern, feature-rich Point of Sale (POS) system designed specifically for restaurants and cafes. Built with SvelteKit and Tailwind CSS, it offers a sleek, responsive interface optimized for touchscreen devices. The system supports comprehensive user management, including administrators and employees, and features robust order and payment processing, sales analytics, and offline capabilities.
